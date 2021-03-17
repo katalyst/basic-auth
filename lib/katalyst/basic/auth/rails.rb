@@ -6,7 +6,7 @@ module Katalyst
       class Railtie < Rails::Railtie
         initializer "katalyst.basic.auth.configure_rack_middleware" do |app|
           middleware = Katalyst::Basic::Auth::Middleware
-          if middleware.enabled?
+          if Config.enabled?
             if Rails::VERSION::MAJOR >= 4
               app.middleware.insert_before Rack::Sendfile, middleware
             else

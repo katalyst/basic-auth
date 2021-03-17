@@ -1,7 +1,7 @@
 # Katalyst::Basic::Auth
 
-This gem provides rails middleware to request basic authentication site-wide.
-The middleware is enabled when the environment variable KATALYST_BASIC_AUTH_ENABLED is set.
+This gem provides rails middleware to request basic authentication for all requests.
+By default, this middleware is installed only for staging and uat rails environments.
 
 ## Installation
 
@@ -25,13 +25,13 @@ Add the gem to your project:
 
     $ bundler add katalyst-basic-auth
 
-Configure the following environment variables to control basic auth
+The following environment variables can optionally be defined to configure the gem
 
 | Environment Variable | Description |
 | ------ | ----- |
-| KATALYST_BASIC_AUTH_ENABLED | If defined the basic auth middleware will be enabled |
-| KATALYST_BASIC_AUTH_USER | The username for basic authentication. Default is the app name in lowercase |
-| KATALYST_BASIC_AUTH_PASS | The password for basic authentication. A password will be generated if not set |
+| KATALYST_BASIC_AUTH_ENABLED | If "yes" or "true", the middleware will be enabled. By default, the middleware is enabled on staging and uat Rails environments |
+| KATALYST_BASIC_AUTH_USER | The username for basic authentication. Default is the Rails application name in lowercase. |
+| KATALYST_BASIC_AUTH_PASS | The password for basic authentication. A password will be generated if not set. |
 
 The gem provides a rake task that can be used to query basic auth settings:
 
