@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Katalyst::Basic::Auth::Config do
+RSpec.describe Katalyst::Basic::Auth::Config do # rubocop:disable Metrics/BlockLength
   subject { described_class }
 
   def with_environment(name, value)
