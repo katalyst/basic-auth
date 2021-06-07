@@ -33,7 +33,13 @@ module Katalyst
           end
 
           def default_username
-            rails? ? Rails.application.class.parent_name.underscore : "katalyst"
+            return "katalyst" unless rails?
+
+            if Rails::VERSION::MAJOR >= 6
+              Rails.application.class.module_parent_name.underscore
+            else
+              Rails.application.class.parent_name.underscore
+            end
           end
 
           def default_password
