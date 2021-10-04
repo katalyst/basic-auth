@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    katalyst-basic-auth (0.2.0)
+    katalyst-basic-auth (0.3.0)
 
 GEM
   remote: https://rubygems.org/
@@ -50,6 +50,7 @@ GEM
 PLATFORMS
   arm64-darwin-20
   x86_64-darwin-19
+  x86_64-darwin-20
 
 DEPENDENCIES
   katalyst-basic-auth!
