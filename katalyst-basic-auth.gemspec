@@ -12,7 +12,8 @@ Gem::Specification.new do |spec|
   # spec.description   = "Gem to add basic auth on staging websites"
   spec.homepage      = "https://github.com/katalyst/katalyst-basic-auth"
   spec.license       = "MIT"
-  spec.required_ruby_version = Gem::Requirement.new(">= 2.4.0")
+  # Supports Rails 3+
+  spec.required_ruby_version = Gem::Requirement.new(">= 2.3.8")
 
   spec.metadata["allowed_push_host"] = "https://github.com"
 
