@@ -1,3 +1,7 @@
+## [0.3.2] - 2022-03-25
+
+- Publish to RubyGems
+
 ## [0.3.1] - 2021-10-23
 
 - Revert ruby version change that broke compatibility with legacy Rails 3 apps
