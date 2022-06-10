@@ -32,6 +32,7 @@ The following environment variables can optionally be defined to configure the g
 | KATALYST_BASIC_AUTH_ENABLED | If "yes" or "true", the middleware will be enabled. By default, the middleware is enabled on staging and uat Rails environments |
 | KATALYST_BASIC_AUTH_USER | The username for basic authentication. Default is the Rails application name in lowercase. |
 | KATALYST_BASIC_AUTH_PASS | The password for basic authentication. A password will be generated if not set. |
+| KATALYST_BASIC_AUTH_IP_ALLOWLIST | Comma or space separated list of IP addresses or CIDR ranges to allow without basic auth |
 
 The gem provides a rake task that can be used to query basic auth settings:
 

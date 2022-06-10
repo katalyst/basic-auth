@@ -1,7 +1,8 @@
 PATH
   remote: .
   specs:
-    katalyst-basic-auth (0.3.2)
+    katalyst-basic-auth (0.4.0)
+      rack
 
 GEM
   remote: https://rubygems.org/
@@ -12,6 +13,7 @@ GEM
     parallel (1.22.0)
     parser (3.1.1.0)
       ast (~> 2.4.1)
+    rack (2.2.3)
     rainbow (3.1.1)
     rake (13.0.6)
     rexml (3.2.5)

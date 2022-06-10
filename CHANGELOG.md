@@ -1,3 +1,7 @@
+## [0.4.0] - 2022-06-10
+
+- Add support for IP address allowlists
+
 ## [0.3.2] - 2022-03-25
 
 - Publish to RubyGems
