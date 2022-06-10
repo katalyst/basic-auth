@@ -13,6 +13,7 @@ module Katalyst
         def call(env)
           config = Config.for_path(env["PATH_INFO"])
           return @app.call(env) unless config.enabled?
+          return @app.call(env) if config.allow_ip?(env)
 
           auth = Rack::Auth::Basic.new(app) do |u, p|
             u == config.username && p == config.password

@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe Katalyst::Basic::Auth::Config do # rubocop:disable Metrics/BlockLength
-  subject { described_class.new }
+  subject { config }
+
+  let(:config) { described_class.new }
 
   def with_environment(name, value)
     orig      = ENV[name]
@@ -15,6 +17,7 @@ RSpec.describe Katalyst::Basic::Auth::Config do # rubocop:disable Metrics/BlockL
       KATALYST_BASIC_AUTH_ENABLED
       KATALYST_BASIC_AUTH_USER
       KATALYST_BASIC_AUTH_PASS
+      KATALYST_BASIC_AUTH_IP_ALLOWLIST
     ]
   end
 
@@ -27,6 +30,12 @@ RSpec.describe Katalyst::Basic::Auth::Config do # rubocop:disable Metrics/BlockL
   it "sets password from environment" do
     with_environment("KATALYST_BASIC_AUTH_PASS", "pass") do
       expect(subject.password).to eq "pass"
+    end
+  end
+
+  it "sets IP allowlist from the environment" do
+    with_environment("KATALYST_BASIC_AUTH_IP_ALLOWLIST", "192.168.1.0/24") do
+      expect(subject.ip_allowlist).to eq([IPAddr.new("192.168.1.0/24")])
     end
   end
 
@@ -89,6 +98,10 @@ RSpec.describe Katalyst::Basic::Auth::Config do # rubocop:disable Metrics/BlockL
       expect(subject.password).to eq "68ccde95e7b6267c"
     end
 
+    it "has an empty IP allowlist" do
+      expect(subject.ip_allowlist).to eq []
+    end
+
     it "is not enabled" do
       expect(subject.enabled?).to be_falsey
     end
@@ -98,6 +111,15 @@ RSpec.describe Katalyst::Basic::Auth::Config do # rubocop:disable Metrics/BlockL
     it "describes basic auth configuration" do
       expect(described_class.description).to be_kind_of(String)
     end
+  end
+
+  describe "allow_ip?" do
+    let(:config) { described_class.new(ip_allowlist: [ip_allowlist]) }
+    let(:ip_allowlist) { "192.168.1.0/24" }
+    let(:remote_ip_header) { "REMOTE_ADDR" }
+
+    it { expect(config.allow_ip?({ remote_ip_header => "192.168.1.1" })).to be_truthy }
+    it { expect(config.allow_ip?({ remote_ip_header => "10.0.1.1" })).to be_falsey }
   end
 
   describe "#for_path" do

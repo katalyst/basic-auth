@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 require "digest"
+require "ipaddr"
+require "rack"
 
 module Katalyst
   module Basic
     module Auth
-      class Config
+      class Config # rubocop:disable Metrics/ClassLength
         DEFAULT_USERNAME = "katalyst"
         ROOT_PATH        = "/"
 
@@ -26,8 +28,19 @@ module Katalyst
             all[0]
           end
 
-          def add(path:, username: nil, password: nil, enabled: nil)
-            config = new(path: path, username: username, password: password, enabled: enabled)
+          # @param path [String] Relative path
+          # @param username [String] Basic auth user name
+          # @param password [String] Basic auth password
+          # @param enabled [Boolean] True to enable basic auth for this path
+          # @param ip_allowlist [Array<String>] List of IP addresses or network ranges to allow without basic auth
+          def add(path:, username: nil, password: nil, enabled: nil, ip_allowlist: nil)
+            config = new(
+              path:         path,
+              username:     username,
+              password:     password,
+              enabled:      enabled,
+              ip_allowlist: ip_allowlist
+            )
             all.delete(all.detect { |i| i.path == config.path })
             all << config
             config
@@ -48,10 +61,7 @@ module Katalyst
           def description
             output = ["Basic auth settings:", ""]
             all.each do |config|
-              output << "path:     #{config.root_path? ? "(global)" : config.path}"
-              output << "enabled:  #{config.enabled?}"
-              output << "username: #{config.username}"
-              output << "password: #{config.password}"
+              output << config.description
               output << ""
             end
             output.join("\n")
@@ -96,9 +106,13 @@ module Katalyst
               ENV["SECRET_KEY_BASE"]
             end
           end
+
+          def default_ip_allowlist
+            ENV.fetch("KATALYST_BASIC_AUTH_IP_ALLOWLIST", "").split(/[\s,]+/)
+          end
         end
 
-        attr_reader :path, :username, :password
+        attr_reader :path, :username, :password, :ip_allowlist
 
         def enabled?
           @enabled
@@ -108,13 +122,37 @@ module Katalyst
           path == ROOT_PATH
         end
 
+        def allow_ip?(env)
+          request = ::Rack::Request.new(env)
+          return false unless request.ip
+
+          remote_ip = IPAddr.new(request.ip)
+          ip_allowlist.any? { |i| i.include?(remote_ip) }
+        end
+
+        def description
+          output = []
+          output << "path:         #{root_path? ? "(global)" : path}"
+          output << "enabled:      #{enabled?}"
+          output << "username:     #{username}"
+          output << "password:     #{password}"
+          output << "ip allowlist: #{ip_allowlist.inspect}"
+          output.join("\n")
+        end
+
         private
 
-        def initialize(path: nil, username: nil, password: nil, enabled: nil)
-          @path     = sanitize_path(path)
-          @username = username || self.class.default_username
-          @password = password || self.class.default_password(@username)
-          @enabled  = enabled.nil? ? (!root_path? || self.class.enabled?) : enabled
+        # @param path [String] Relative path
+        # @param username [String] Basic auth user name
+        # @param password [String] Basic auth password
+        # @param enabled [Boolean] True to enable basic auth for this path
+        # @param ip_allowlist [Array<String>] List of IP addresses or network ranges to allow without basic auth
+        def initialize(path: nil, username: nil, password: nil, enabled: nil, ip_allowlist: nil)
+          @path         = sanitize_path(path)
+          @username     = username || self.class.default_username
+          @password     = password || self.class.default_password(@username)
+          @enabled      = enabled.nil? ? (!root_path? || self.class.enabled?) : enabled
+          @ip_allowlist = initialize_ip_allowlist(ip_allowlist)
         end
 
         def sanitize_path(path)
@@ -122,6 +160,10 @@ module Katalyst
 
           path = "/#{path}" unless path.start_with?("/")
           path
+        end
+
+        def initialize_ip_allowlist(ip_allowlist)
+          (ip_allowlist || self.class.default_ip_allowlist).map { |i| IPAddr.new(i) }
         end
       end
     end
