@@ -46,12 +46,16 @@ module Katalyst
             config
           end
 
+          def up(path = "/up")
+            new(path: path, enabled: false)
+          end
+
           def all
-            @all ||= [new]
+            @all ||= [new, up]
           end
 
           def reset!
-            @all = [new]
+            @all = [new, up]
           end
 
           def each(&block)

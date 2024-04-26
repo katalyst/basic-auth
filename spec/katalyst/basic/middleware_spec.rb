@@ -41,6 +41,15 @@ RSpec.describe Katalyst::Basic::Auth::Middleware do # rubocop:disable Metrics/Bl
     it { expect(basic_auth).to have_received(:call) }
   end
 
+  context "with rails health check path" do
+    let(:request_path) { "/up" }
+
+    before { middleware.call(env) }
+
+    it { expect(app).to have_received(:call) }
+    it { expect(basic_auth).not_to have_received(:call) }
+  end
+
   context "with an excluded path" do
     let(:request_path) { "/no_auth/path" }
 

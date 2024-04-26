@@ -1,3 +1,7 @@
+## [0.5.0] - 2024-04-26
+
+- Add `/up` as a default allowed path (Rails 7.1+ health check)
+
 ## [0.4.0] - 2022-06-10
 
 - Add support for IP address allowlists
