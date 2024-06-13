@@ -5,6 +5,7 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in katalyst-basic-auth.gemspec
 gemspec
 
+gem "activesupport"
 gem "rake"
 
 group :development, :test do

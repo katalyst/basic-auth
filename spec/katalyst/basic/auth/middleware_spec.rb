@@ -3,28 +3,28 @@
 RSpec.describe Katalyst::Basic::Auth::Middleware do # rubocop:disable Metrics/BlockLength
   subject { middleware }
 
+  # Create an app instance for call tracking (use 'expect' to verify)
+  def app_stub
+    klass = Class.new
+    klass.define_method(:call) { |_| nil }
+    app = klass.new
+    allow(app).to receive(:call)
+    app
+  end
+
   let(:middleware) { described_class.new(app) }
-  let(:app) do
-    app = Object.new
-    app.define_singleton_method(:call) {}
-    app
-  end
-  let(:basic_auth) do
-    app = Object.new
-    app.define_singleton_method(:call) {}
-    app
-  end
+  let(:app) { app_stub }
+  let(:basic_auth) { app_stub }
+
   let(:env) { { "PATH_INFO" => request_path, "REMOTE_ADDR" => request_ip } }
   let(:request_path) { "/" }
   let(:request_ip) { "127.0.0.1" }
 
   before do
-    allow(app).to receive(:call)
-    allow(basic_auth).to receive(:call)
     allow(Rack::Auth::Basic).to receive(:new).and_return(basic_auth)
   end
 
-  around(:each) do |example|
+  around do |example|
     Katalyst::Basic::Auth::Config.add(path: "/", enabled: true, username: "test", password: "test")
     Katalyst::Basic::Auth::Config.add(path: "/no_auth", enabled: false)
     Katalyst::Basic::Auth::Config.add(path: "/test_path", ip_allowlist: ["192.168.1.0/24"])

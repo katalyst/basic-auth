@@ -79,7 +79,7 @@ module Katalyst
           def enabled_rails_env?
             return false unless rails?
 
-            Rails.env.staging? || Rails.env.uat?
+            %w[staging uat].include?(Rails.env)
           end
 
           def rails?
@@ -107,7 +107,7 @@ module Katalyst
             if rails? && Rails.application.respond_to?(:secret_key_base)
               Rails.application.secret_key_base
             else
-              ENV["SECRET_KEY_BASE"]
+              ENV.fetch("SECRET_KEY_BASE", nil)
             end
           end
 

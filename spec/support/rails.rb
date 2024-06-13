@@ -1,16 +1,6 @@
 # frozen_string_literal: true
 
-class DummyRailsEnv
-  ENVIRONMENTS = %w[production development staging uat].freeze
-
-  attr_accessor :value
-
-  ENVIRONMENTS.each do |env|
-    define_method("#{env}?") do
-      value == env
-    end
-  end
-end
+require "active_support/string_inquirer"
 
 class DummyRails
   module VERSION
@@ -36,6 +26,14 @@ class DummyRails
   class << self
     def application
       Application.new
+    end
+
+    def env
+      @env ||= ActiveSupport::StringInquirer.new("development")
+    end
+
+    def env=(value)
+      @env = ActiveSupport::StringInquirer.new(value)
     end
   end
 end
