@@ -2,7 +2,6 @@ PATH
   remote: .
   specs:
     katalyst-basic-auth (0.5.0)
-      rack
 
 GEM
   remote: https://rubygems.org/
@@ -79,6 +78,7 @@ PLATFORMS
 DEPENDENCIES
   activesupport
   katalyst-basic-auth!
+  rack
   rake
   rspec
   rubocop

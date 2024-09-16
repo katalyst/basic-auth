@@ -24,6 +24,4 @@ Gem::Specification.new do |spec|
   spec.files = Dir["{lib}/**/*", "CHANGELOG.md", "LICENSE.txt", "README.md"]
 
   spec.require_paths = ["lib"]
-
-  spec.add_runtime_dependency "rack"
 end
