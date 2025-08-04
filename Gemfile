@@ -8,6 +8,7 @@ gemspec
 gem "activesupport"
 gem "rack"
 gem "rake"
+gem "rubocop-katalyst", require: false
 
 group :development, :test do
   gem "rspec"

@@ -19,8 +19,8 @@ module Katalyst
           def for_path(path)
             path ||= ROOT_PATH
             all.sort_by(&:path)
-               .reverse
-               .detect { |i| path.match(/^#{i.path}/) } || global
+              .reverse
+              .detect { |i| path.match(/^#{i.path}/) } || global
           end
 
           # @return [Config] The global configuration
@@ -39,7 +39,7 @@ module Katalyst
               username:     username,
               password:     password,
               enabled:      enabled,
-              ip_allowlist: ip_allowlist
+              ip_allowlist: ip_allowlist,
             )
             all.delete(all.detect { |i| i.path == config.path })
             all << config
@@ -58,8 +58,8 @@ module Katalyst
             @all = [new, up]
           end
 
-          def each(&block)
-            all.each(&block)
+          def each(&)
+            all.each(&)
           end
 
           def description
@@ -136,7 +136,7 @@ module Katalyst
 
         def description
           output = []
-          output << "path:         #{root_path? ? "(global)" : path}"
+          output << "path:         #{root_path? ? '(global)' : path}"
           output << "enabled:      #{enabled?}"
           output << "username:     #{username}"
           output << "password:     #{password}"
