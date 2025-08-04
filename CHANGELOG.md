@@ -1,3 +1,7 @@
+## [1.0.0] - 2025-08-04
+
+- Drop support for old ruby versions
+
 ## [0.5.0] - 2024-04-26
 
 - Add `/up` as a default allowed path (Rails 7.1+ health check)
