@@ -76,7 +76,7 @@ RSpec.describe Katalyst::Basic::Auth::Config do # rubocop:disable Metrics/BlockL
 
   context "with default settings" do
     around do |example|
-      orig_env = ENV.to_h.dup
+      orig_env                           = ENV.to_h.dup
       all_env_settings.each { |i| ENV.delete(i) }
       example.run
       all_env_settings.each { |i| ENV[i] = orig_env[i] }

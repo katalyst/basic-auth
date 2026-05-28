@@ -7,7 +7,7 @@ RSpec.describe Katalyst::Basic::Auth::Middleware do # rubocop:disable Metrics/Bl
   def app_stub
     klass = Class.new
     klass.define_method(:call) { |_| nil }
-    app = klass.new
+    app   = klass.new
     allow(app).to receive(:call)
     app
   end

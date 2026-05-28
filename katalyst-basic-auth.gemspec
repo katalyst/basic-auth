@@ -14,12 +14,12 @@ Gem::Specification.new do |spec|
   # Supports Rails 3+
   spec.required_ruby_version = Gem::Requirement.new(">= 3.3")
 
-  spec.metadata["allowed_push_host"] = "https://rubygems.org"
+  spec.metadata["allowed_push_host"]     = "https://rubygems.org"
   spec.metadata["rubygems_mfa_required"] = "true"
 
-  spec.metadata["homepage_uri"] = spec.homepage
+  spec.metadata["homepage_uri"]    = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/katalyst/basic-auth"
-  spec.metadata["changelog_uri"] = "https://github.com/katalyst/basic-auth/blob/main/CHANGELOG.md"
+  spec.metadata["changelog_uri"]   = "https://github.com/katalyst/basic-auth/blob/main/CHANGELOG.md"
 
   spec.files = Dir["{lib}/**/*", "CHANGELOG.md", "LICENSE.txt", "README.md"]
 
