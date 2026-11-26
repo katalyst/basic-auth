@@ -17,10 +17,17 @@ module Katalyst
           # @param path [String] Request path
           # @return [Config] The config for the given path
           def for_path(path)
-            path ||= ROOT_PATH
+            path = normalize_path(path)
             all.sort_by(&:path)
               .reverse
-              .detect { |i| path.match(/^#{i.path}/) } || global
+              .detect { |i| i.match?(path) } || global
+          end
+
+          # Compare paths the way the Rails router will see them, e.g. "//admin" routes to "/admin"
+          # @param path [String, nil] Request path
+          # @return [String] Path with repeated slashes collapsed
+          def normalize_path(path)
+            "/#{path}".squeeze("/")
           end
 
           # @return [Config] The global configuration
@@ -124,6 +131,14 @@ module Katalyst
 
         def root_path?
           path == ROOT_PATH
+        end
+
+        # Matches the configured path and anything below it, on path segment boundaries,
+        # e.g. "/up" matches "/up" and "/up/db" but not "/uploads"
+        # @param request_path [String] Normalized request path
+        def match?(request_path)
+          prefix = path.chomp("/")
+          request_path == prefix || request_path.start_with?("#{prefix}/")
         end
 
         def allow_ip?(env)

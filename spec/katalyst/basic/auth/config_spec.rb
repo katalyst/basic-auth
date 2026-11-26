@@ -127,6 +127,23 @@ RSpec.describe Katalyst::Basic::Auth::Config do # rubocop:disable Metrics/BlockL
       expect(described_class.for_path("/path_b/foo/bar.html")).to eq(config_b)
     end
 
+    it "matches path a with repeated slashes" do
+      expect(described_class.for_path("//path_a//foo/bar.html")).to eq(config_a)
+    end
+
+    it "matches path a exactly" do
+      expect(described_class.for_path("/path_a")).to eq(config_a)
+    end
+
+    it "matches path a configured with a trailing slash" do
+      config = described_class.add(path: "/path_a/", username: "user_a")
+      expect(described_class.for_path("/path_a")).to eq(config)
+    end
+
+    it "does not match a path that only shares a prefix with path a" do
+      expect(described_class.for_path("/path_abc/foo/bar.html")).to eq(described_class.global)
+    end
+
     it "matches the global config" do
       expect(described_class.for_path("/path_c/foo/bar.html")).to eq(described_class.global)
     end

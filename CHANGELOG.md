@@ -1,3 +1,8 @@
+## [1.0.1] - 2026-11-26
+
+- Fix: normalise repeated slashes before matching paths, e.g. `//admin` is matched as `/admin`
+- Fix: match configured paths on segment boundaries, e.g. excluding `/up` no longer excludes `/uploads`
+
 ## [1.0.0] - 2025-08-04
 
 - Drop support for old ruby versions

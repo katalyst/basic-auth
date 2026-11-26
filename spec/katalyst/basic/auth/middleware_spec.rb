@@ -41,6 +41,20 @@ RSpec.describe Katalyst::Basic::Auth::Middleware do # rubocop:disable Metrics/Bl
     it { expect(basic_auth).to have_received(:call) }
   end
 
+  context "with repeated slashes in a protected path when global auth is disabled" do
+    # Rails routes repeated slashes as if they were single slashes
+    let(:request_path) { "//protected/path" }
+
+    before do
+      Katalyst::Basic::Auth::Config.add(path: "/", enabled: false)
+      Katalyst::Basic::Auth::Config.add(path: "/protected", enabled: true)
+      middleware.call(env)
+    end
+
+    it { expect(app).not_to have_received(:call) }
+    it { expect(basic_auth).to have_received(:call) }
+  end
+
   context "with rails health check path" do
     let(:request_path) { "/up" }
 
@@ -48,6 +62,15 @@ RSpec.describe Katalyst::Basic::Auth::Middleware do # rubocop:disable Metrics/Bl
 
     it { expect(app).to have_received(:call) }
     it { expect(basic_auth).not_to have_received(:call) }
+  end
+
+  context "with a path that starts with the rails health check path" do
+    let(:request_path) { "/uploads/file.pdf" }
+
+    before { middleware.call(env) }
+
+    it { expect(app).not_to have_received(:call) }
+    it { expect(basic_auth).to have_received(:call) }
   end
 
   context "with an excluded path" do
