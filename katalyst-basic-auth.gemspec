@@ -2,7 +2,8 @@
 
 Gem::Specification.new do |spec|
   spec.name          = "katalyst-basic-auth"
-  spec.version       = "1.0.1"
+  spec.version       = "2.0.0"
+
   spec.authors       = ["Katalyst Interactive"]
   spec.email         = ["developers@katalyst.com.au"]
 
@@ -11,8 +12,8 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/katalyst/katalyst-basic-auth"
   spec.license       = "MIT"
 
-  # Supports Rails 3+
-  spec.required_ruby_version = Gem::Requirement.new(">= 3.3")
+  # Supports Ruby 4+
+  spec.required_ruby_version = Gem::Requirement.new(">= 4.0")
 
   spec.metadata["allowed_push_host"]     = "https://rubygems.org"
   spec.metadata["rubygems_mfa_required"] = "true"

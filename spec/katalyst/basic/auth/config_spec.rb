@@ -103,6 +103,11 @@ RSpec.describe Katalyst::Basic::Auth::Config do # rubocop:disable Metrics/BlockL
     it "describes basic auth configuration" do
       expect(described_class.description).to be_a(String)
     end
+
+    it "describes patterns" do
+      described_class.add(path: %r{\A/clients/}, enabled: false)
+      expect(described_class.description).to include("path:         #{%r{\A/clients/}.inspect}")
+    end
   end
 
   describe "allow_ip?" do
@@ -142,6 +147,64 @@ RSpec.describe Katalyst::Basic::Auth::Config do # rubocop:disable Metrics/BlockL
 
     it "does not match a path that only shares a prefix with path a" do
       expect(described_class.for_path("/path_abc/foo/bar.html")).to eq(described_class.global)
+    end
+
+    it "matches paths literally" do
+      described_class.add(path: "/clients/.*/webhooks", enabled: false)
+      expect(described_class.for_path("/clients/1/webhooks/2")).to eq(described_class.global)
+    end
+
+    it "matches a pattern" do
+      config = described_class.add(path: %r{/clients/[^/]+/webhooks/[^/]+}, enabled: false)
+      expect(described_class.for_path("/clients/1/webhooks/2")).to eq(config)
+    end
+
+    it "matches a pattern against the normalized path" do
+      config = described_class.add(path: %r{/clients/[^/]+/webhooks/[^/]+}, enabled: false)
+      expect(described_class.for_path("//clients/1//webhooks/2")).to eq(config)
+    end
+
+    it "does not match a pattern that matches the start of the path" do
+      described_class.add(path: %r{/clients/[^/]+/webhooks}, enabled: false)
+      expect(described_class.for_path("/clients/1/webhooks/2")).to eq(described_class.global)
+    end
+
+    it "does not match a pattern that matches the end of the path" do
+      described_class.add(path: %r{/clients/[^/]+/webhooks/[^/]+}, enabled: false)
+      expect(described_class.for_path("/admin/clients/1/webhooks/2")).to eq(described_class.global)
+    end
+
+    it "keeps pattern flags" do
+      config = described_class.add(path: %r{/clients/[^/]+/webhooks/[^/]+}i, enabled: false)
+      expect(described_class.for_path("/Clients/1/Webhooks/2")).to eq(config)
+    end
+
+    it "matches the last rule added rather than an earlier path" do
+      config = described_class.add(path: %r{/path_a/[^/]+/webhooks/[^/]+}, enabled: false)
+      expect(described_class.for_path("/path_a/1/webhooks/2")).to eq(config)
+    end
+
+    it "matches the last rule added rather than an earlier pattern" do
+      described_class.add(path: %r{/path_c/[^/]+/webhooks/[^/]+}, enabled: false)
+      config = described_class.add(path: "/path_c")
+      expect(described_class.for_path("/path_c/1/webhooks/2")).to eq(config)
+    end
+
+    it "matches the last rule added rather than an earlier more specific path" do
+      described_class.add(path: "/path_c/secure")
+      config = described_class.add(path: "/path_c")
+      expect(described_class.for_path("/path_c/secure")).to eq(config)
+    end
+
+    it "matches a path added again after a more specific path" do
+      described_class.add(path: "/path_a/secure")
+      config = described_class.add(path: "/path_a", username: "replaced")
+      expect(described_class.for_path("/path_a/secure")).to eq(config)
+    end
+
+    it "matches the global config when it is added after other rules" do
+      config = described_class.add(path: "/", username: "replaced")
+      expect(described_class.for_path("/path_a")).to eq(config)
     end
 
     it "matches the global config" do

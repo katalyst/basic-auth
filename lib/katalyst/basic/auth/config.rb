@@ -15,12 +15,10 @@ module Katalyst
           include Enumerable
 
           # @param path [String] Request path
-          # @return [Config] The config for the given path
+          # @return [Config] The last rule added that matches the given path
           def for_path(path)
             path = normalize_path(path)
-            all.sort_by(&:path)
-              .reverse
-              .detect { |i| i.match?(path) } || global
+            all.rfind { |i| i.match?(path) }
           end
 
           # Compare paths the way the Rails router will see them, e.g. "//admin" routes to "/admin"
@@ -32,10 +30,11 @@ module Katalyst
 
           # @return [Config] The global configuration
           def global
-            all[0]
+            all.first
           end
 
-          # @param path [String] Relative path
+          # Adds a rule that takes priority over the rules added before it
+          # @param path [String, Regexp] Relative path, or a pattern that must match the whole request path
           # @param username [String] Basic auth user name
           # @param password [String] Basic auth password
           # @param enabled [Boolean] True to enable basic auth for this path
@@ -48,7 +47,6 @@ module Katalyst
               enabled:      enabled,
               ip_allowlist: ip_allowlist,
             )
-            all.delete(all.detect { |i| i.path == config.path })
             all << config
             config
           end
@@ -57,12 +55,14 @@ module Katalyst
             new(path: path, enabled: false)
           end
 
+          # @return [Array<Config>] Rules in the order they were added, starting with the global configuration and
+          #   the Rails health check
           def all
             @all ||= [new, up]
           end
 
           def reset!
-            @all = [new, up]
+            @all = nil
           end
 
           def each(&)
@@ -133,12 +133,18 @@ module Katalyst
           path == ROOT_PATH
         end
 
-        # Matches the configured path and anything below it, on path segment boundaries,
-        # e.g. "/up" matches "/up" and "/up/db" but not "/uploads"
+        def pattern?
+          path.is_a?(Regexp)
+        end
+
+        # Paths match themselves and anything below them, on path segment boundaries,
+        # e.g. "/up" matches "/up" and "/up/db" but not "/uploads".
+        # Patterns must match the whole request path, e.g. %r{/clients/[^/]+/webhooks/[^/]+}.
         # @param request_path [String] Normalized request path
         def match?(request_path)
-          prefix = path.chomp("/")
-          request_path == prefix || request_path.start_with?("#{prefix}/")
+          return /\A(?:#{path})\z/.match?(request_path) if pattern?
+
+          request_path == path || request_path.start_with?("#{path.chomp('/')}/")
         end
 
         def allow_ip?(env)
@@ -151,7 +157,7 @@ module Katalyst
 
         def description
           output = []
-          output << "path:         #{root_path? ? '(global)' : path}"
+          output << "path:         #{root_path? ? '(global)' : path_description}"
           output << "enabled:      #{enabled?}"
           output << "username:     #{username}"
           output << "password:     #{password}"
@@ -161,7 +167,11 @@ module Katalyst
 
         private
 
-        # @param path [String] Relative path
+        def path_description
+          pattern? ? path.inspect : path
+        end
+
+        # @param path [String, Regexp] Relative path, or a pattern that must match the whole request path
         # @param username [String] Basic auth user name
         # @param password [String] Basic auth password
         # @param enabled [Boolean] True to enable basic auth for this path
@@ -176,9 +186,10 @@ module Katalyst
 
         def sanitize_path(path)
           return ROOT_PATH if path.nil?
+          return path if path.is_a?(Regexp)
 
           path = "/#{path}" unless path.start_with?("/")
-          path
+          path == ROOT_PATH ? path : path.chomp("/")
         end
 
         def initialize_ip_allowlist(ip_allowlist)

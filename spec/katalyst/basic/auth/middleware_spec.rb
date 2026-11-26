@@ -20,16 +20,18 @@ RSpec.describe Katalyst::Basic::Auth::Middleware do # rubocop:disable Metrics/Bl
   let(:request_path) { "/" }
   let(:request_ip) { "127.0.0.1" }
 
-  before do
-    allow(Rack::Auth::Basic).to receive(:new).and_return(basic_auth)
+  around do |example|
+    enabled                            = ENV.fetch("KATALYST_BASIC_AUTH_ENABLED", nil)
+    ENV["KATALYST_BASIC_AUTH_ENABLED"] = "true"
+    example.run
+  ensure
+    ENV["KATALYST_BASIC_AUTH_ENABLED"] = enabled
   end
 
-  around do |example|
-    Katalyst::Basic::Auth::Config.add(path: "/", enabled: true, username: "test", password: "test")
+  before do
+    allow(Rack::Auth::Basic).to receive(:new).and_return(basic_auth)
     Katalyst::Basic::Auth::Config.add(path: "/no_auth", enabled: false)
     Katalyst::Basic::Auth::Config.add(path: "/test_path", ip_allowlist: ["192.168.1.0/24"])
-    example.run
-    Katalyst::Basic::Auth::Config.reset!
   end
 
   context "with a basic auth protected path" do

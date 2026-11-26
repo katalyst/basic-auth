@@ -9,7 +9,7 @@ module Katalyst
     module Auth
       class << self
         # Add a path to be protected by basic authentication
-        # @param path [String] Relative path
+        # @param path [String, Regexp] Relative path, or a pattern that must match the whole request path
         # @param username [String] Basic auth user name
         # @param password [String] Basic auth password
         # @param ip_allowlist [Array<String>] List of IP addresses or network ranges to allow without basic auth
@@ -22,7 +22,7 @@ module Katalyst
         end
 
         # Add a path to be excluded from basic authentication
-        # @param path [String] Relative path
+        # @param path [String, Regexp] Relative path, or a pattern that must match the whole request path
         def exclude(path)
           Config.add(path: path, enabled: false)
         end

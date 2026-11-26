@@ -1,7 +1,19 @@
+## [2.0.0] - 2026-11-26
+
+- Breaking: when more than one rule matches a request, the rule added last applies; previously the most specific path
+  applied regardless of order
+- Breaking: drops support for Ruby < 4
+- Add support for `Regexp` paths, e.g. `exclude(%r{/clients/[^/]+/webhooks/[^/]+})`; patterns must match the whole
+  request path
+- String paths are matched literally, as in 1.0.1; apps that relied on regular expressions in string paths should
+  upgrade to 2.0 and pass a `Regexp` instead
+
 ## [1.0.1] - 2026-11-26
 
 - Fix: normalise repeated slashes before matching paths, e.g. `//admin` is matched as `/admin`
 - Fix: match configured paths on segment boundaries, e.g. excluding `/up` no longer excludes `/uploads`
+- Breaking (unintentional): string paths are matched literally, so regular expressions in string paths such as
+  `/clients/.*/webhooks/.*` no longer match; upgrade to 2.0 and use a `Regexp` for patterns
 
 ## [1.0.0] - 2025-08-04
 

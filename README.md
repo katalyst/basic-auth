@@ -48,6 +48,18 @@ Paths can also be excluded from basic auth. e.g. to allow access to `/public` wi
 
     Katalyst::Basic::Auth.exclude("/public")
 
+Paths match themselves and anything below them, e.g. `/public` matches `/public` and `/public/robots.txt` but not
+`/publications`. Use a `Regexp` to match other paths. A pattern must match the whole request path:
+
+    Katalyst::Basic::Auth.exclude(%r{/clients/[^/]+/webhooks/[^/]+})
+
+When more than one rule matches a request, the rule added last applies, so add general rules before their exceptions:
+
+    Katalyst::Basic::Auth.exclude("/admin")
+    Katalyst::Basic::Auth.add("/admin/secure", username: "user", password: "pass")
+
+Requests that match no rule use the global settings.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

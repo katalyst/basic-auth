@@ -35,5 +35,9 @@ class DummyRails
     def env=(value)
       @env = ActiveSupport::StringInquirer.new(value)
     end
+
+    def reset!
+      @env = nil
+    end
   end
 end
